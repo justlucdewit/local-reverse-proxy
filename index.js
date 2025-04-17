@@ -47,16 +47,33 @@ const proxy = httpProxy.createProxyServer();
 
 const server = http.createServer(async (req, res) => {
     const u = req.headers.host;
+
+    if (req.headers.host === 'localhost' && req.url === '/overview') {
+        const overview_html_page = fs.readFileSync("./pages/overview.html", "utf8").replace('"inject_data_here"', JSON.stringify(proxyTable));
+            
+        res.setHeader("Content-Type", "text/html");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.writeHead(200);
+        res.end(overview_html_page);
+
+        return;
+    }
+
     const domain = u.split(".").slice(Math.max(u.split(".").length - 2, 0)).join(".")
     const target = proxyTable[domain];
 
     if (target) {
-        // console.log(`Proxying request from ${req.headers.host} to ${target}`);
         proxy.web(req, res, { target }, (err) => {
-            // console.error(`Proxy error for ${req.headers.host}:`, err);
-            res.writeHead(502);
-            res.end("Bad Gateway");
+            const notrunning_html_page = fs.readFileSync("./pages/not_running.html", "utf8").replace('"inject_data_here"', JSON.stringify(proxyTable));
+
+            res.setHeader("Content-Type", "text/html");
+            res.setHeader("Access-Control-Allow-Origin", "*");
+            res.writeHead(200);
+            res.end(notrunning_html_page);
         });
+
+        
+        
     } else {
         const proxied_domains_response = await Promise.all(JSON.parse(JSON.stringify(hostsFileItems)).map(async (entry) => {
             try {

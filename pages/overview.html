@@ -1,0 +1,116 @@
+<html>
+    <head>
+        <title>Overview | Lukes Reverse Proxy</title>
+        <style>
+            body {
+                margin: 0;
+                padding: 0;
+            }
+
+            header {
+                color: white;
+                background: black;
+                padding: 20px;
+                display: flex;
+                align-items: center;
+
+                img {
+                    height: 50px;
+                }
+            }
+
+            main {
+                width: 80vw;
+                max-width: 800px;
+                position: relative;
+                left: 50vw;
+                transform: translateX(-50%);
+                background: #eee;
+                padding: 20px;
+                margin-top: 30px;
+            }
+
+            table {
+                width: 100%;
+                text-align: left;
+                border-collapse: collapse;
+
+                thead tr {
+                    background: rgba(0, 0, 0, 0.1);
+                }
+
+                tbody tr {
+                    &:hover {
+                        background: rgba(0, 0, 0, 0.3);
+                        cursor: pointer;
+                    }
+                }
+
+                tr {
+
+                    &:nth-child(even) {
+                        background: rgba(0, 0, 0, 0.1);
+                    }
+
+                    &:nth-child(odd) {
+                        background: rgba(0, 0, 0, 0.05);
+                    }
+                    
+                    td, th {
+                        padding: 5px 10px;
+                    }
+                }
+            }
+
+            h1 {
+                margin: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <img src="https://thumb.ac-illust.com/1e/1e4e382499bd10f4bc814033adb85517_t.jpeg" id="icon">
+            <h1>Lukes Reverse Proxy</h1>
+        </header>
+
+        <main>
+            <h2>Site overview</h2>
+            <p>
+                Sites are gathered based on your /etc/hosts file, to see more about how to do this, visit the
+                <a target="_blank" href="https://github.com/justlucdewit/local-reverse-proxy?tab=readme-ov-file#usage">
+                    repository
+                </a>
+            </p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Proxied URL</th>
+                        <th>Proxies to localhost port</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="mount">
+
+                </tbody>
+            </table>
+        </main>
+
+        <script>
+            const data="inject_data_here";
+            const mount=document.getElementById('mount');
+
+            Object.entries(data).forEach(([key, value]) => {
+                const rowEl = document.createElement('tr');
+
+                rowEl.innerHTML = `
+                    <td>${key}</td>
+                    <td>${value.split(':').at(-1)}</td>
+                    <td></td>
+                `
+
+                mount.appendChild(rowEl);
+            });
+        </script>
+    </body>
+</html>
