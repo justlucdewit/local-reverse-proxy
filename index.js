@@ -24,11 +24,22 @@ function getTestDomainsFromHosts() {
     return domains;
 }
 
-const proxyTable = {};
+let proxyTable = {};
 const hostsFileItems = getTestDomainsFromHosts();
 hostsFileItems.forEach(item => {
     console.log(`Registered domain to proxy: ${item.domain} => http://127.0.0.1:${item.port}`);
     proxyTable[item.domain] = `http://127.0.0.1:${item.port}`
+});
+
+// Re-parse the hosts file when edited
+fs.watchFile('/etc/hosts', () => {
+    console.log("Hosts file changed, updating proxyTable...");
+    const newHosts = getTestDomainsFromHosts();
+    proxyTable = {};
+    newHosts.forEach(item => {
+        console.log(`Registered domain to proxy: ${item.domain} => http://127.0.0.1:${item.port}`);
+        proxyTable[item.domain] = `http://127.0.0.1:${item.port}`;
+    });
 });
 
 // Create a proxy server
@@ -40,9 +51,9 @@ const server = http.createServer(async (req, res) => {
     const target = proxyTable[domain];
 
     if (target) {
-        console.log(`Proxying request from ${req.headers.host} to ${target}`);
+        // console.log(`Proxying request from ${req.headers.host} to ${target}`);
         proxy.web(req, res, { target }, (err) => {
-            console.error(`Proxy error for ${req.headers.host}:`, err);
+            // console.error(`Proxy error for ${req.headers.host}:`, err);
             res.writeHead(502);
             res.end("Bad Gateway");
         });
