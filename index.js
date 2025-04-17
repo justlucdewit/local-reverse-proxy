@@ -68,6 +68,11 @@ const server = http.createServer(async (req, res) => {
     }
 });
 
+process.on('SIGINT', () => {
+    console.log("Shutting down proxy...");
+    server.close(() => process.exit(0));
+});
+
 // Start the proxy server
 server.listen(80, () => {
     console.log("Reverse proxy running on port 80");
