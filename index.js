@@ -48,6 +48,7 @@ const proxy = httpProxy.createProxyServer();
 const server = http.createServer(async (req, res) => {
     const u = req.headers.host;
 
+    // /overview page
     if (req.headers.host === 'localhost' && req.url === '/overview') {
         const overview_html_page = fs.readFileSync("./pages/overview.html", "utf8").replace('"inject_data_here"', JSON.stringify(proxyTable));
             
@@ -55,6 +56,18 @@ const server = http.createServer(async (req, res) => {
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.writeHead(200);
         res.end(overview_html_page);
+
+        return;
+    }
+
+    // /icon endpoint
+    if (req.headers.host === 'localhost' && req.url === '/icon.png') {
+        const icon_png = fs.readFileSync("./assets/reverse_proxy_icon.png");
+            
+        res.setHeader("Content-Type", "image/png");
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        res.writeHead(200);
+        res.end(icon_png);
 
         return;
     }
