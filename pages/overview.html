@@ -10,13 +10,21 @@
             header {
                 color: white;
                 background: black;
-                padding: 20px;
-                display: flex;
-                align-items: center;
 
                 img {
                     height: 50px;
                     padding-right: 20px;
+                }
+
+                section {
+                    width: 80vw;
+                    max-width: 800px;
+                    position: relative;
+                    left: 50vw;
+                    transform: translateX(-50%);
+                    display: flex;
+                    align-items: center;
+                    padding: 20px;
                 }
             }
 
@@ -59,6 +67,15 @@
                     
                     td, th {
                         padding: 5px 10px;
+
+                        &.stopped {
+                            color: gray;
+                        }
+
+                        &.running {
+                            color: rgb(96, 136, 37);
+                            font-weight: bold;
+                        }
                     }
                 }
             }
@@ -70,8 +87,10 @@
     </head>
     <body>
         <header>
-            <img src="http://localhost/icon.png" id="icon">
-            <h1>Lukes Reverse Proxy</h1>
+            <section>
+                <img src="http://localhost/icon.png" id="icon">
+                <h1>Lukes Reverse Proxy</h1>
+            </section>
         </header>
 
         <main>
@@ -101,14 +120,18 @@
             const data="inject_data_here";
             const mount=document.getElementById('mount');
 
-            Object.entries(data).forEach(([key, value]) => {
+            data.forEach(proxy => {
                 const rowEl = document.createElement('tr');
 
+                rowEl.onclick = () => {
+                    window.open('http://' + proxy.proxied_site)
+                }
+
                 rowEl.innerHTML = `
-                    <td>${key}</td>
-                    <td>${value.split(':').at(-1)}</td>
-                    <td></td>
-                `
+                    <td>${proxy.proxied_site}</td>
+                    <td>${proxy.port}</td>
+                    <td class="${proxy.status == 'running' ? 'running' : 'stopped'}">${proxy.status}</td>
+                `;
 
                 mount.appendChild(rowEl);
             });

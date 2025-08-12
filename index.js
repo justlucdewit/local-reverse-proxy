@@ -2,6 +2,8 @@ const fs = require('fs');
 const http = require('http');
 const httpProxy = require('http-proxy');
 
+const { execSync } = require('child_process');
+
 function getTestDomainsFromHosts() {
     const hostsFilePath = '/etc/hosts';
     const hostsContent = fs.readFileSync(hostsFilePath, 'utf-8');
@@ -45,12 +47,44 @@ fs.watchFile('/etc/hosts', () => {
 // Create a proxy server
 const proxy = httpProxy.createProxyServer();
 
+function getListeningPorts() {
+    let output;
+    try {
+        output = execSync('lsof -iTCP -sTCP:LISTEN -n -P', { encoding: 'utf8' });
+        return new Set(
+            output
+                .split('\n')
+                .map(line => line.match(/:(\d+)\s/))
+                .filter(Boolean)
+                .map(match => match[1])
+        );
+    } catch (err) {
+        console.error('Error checking ports:', err);
+        return new Set();
+    }
+}
+
 const server = http.createServer(async (req, res) => {
     const u = req.headers.host;
 
     // /overview page
     if (req.headers.host === 'localhost' && req.url === '/overview') {
-        const overview_html_page = fs.readFileSync("./pages/overview.html", "utf8").replace('"inject_data_here"', JSON.stringify(proxyTable));
+
+        // Add status to proxyTable
+        const overview_data = Object.entries(proxyTable).map(([key, value]) => ({
+            proxied_site: key,
+            original_site: value,
+            port: value.split(':').at(-1)
+        }))
+
+        const runningPorts = getListeningPorts();
+
+        for (let i = 0; i < overview_data.length; i ++) {
+            const proxy = overview_data[i]
+            proxy.status = runningPorts.has(proxy.port) ? 'running' : 'stopped';
+        }
+
+        const overview_html_page = fs.readFileSync("./pages/overview.html", "utf8").replace('"inject_data_here"', JSON.stringify(overview_data));
             
         res.setHeader("Content-Type", "text/html");
         res.setHeader("Access-Control-Allow-Origin", "*");
