@@ -10,13 +10,21 @@
             header {
                 color: white;
                 background: black;
-                padding: 20px;
-                display: flex;
-                align-items: center;
 
                 img {
                     height: 50px;
                     padding-right: 20px;
+                }
+
+                section {
+                    width: 80vw;
+                    max-width: 800px;
+                    position: relative;
+                    left: 50vw;
+                    transform: translateX(-50%);
+                    display: flex;
+                    align-items: center;
+                    padding: 20px;
                 }
             }
 
@@ -77,28 +85,42 @@
                 }
             }
 
-            button {
+            button,.button {
                 background: black;
                 color: white;
                 padding: 10px;
                 border-radius: 5px;
                 outline: none;
                 border: none;
+                display: inline-block;
+                margin-right: 20px;
+                text-decoration: none;
+                font-size: 16px;
 
                 &:hover {
                     cursor: pointer;
+                    opacity: 0.6;
                 }
+            }
+
+            .button {
+                height: 20px;
+                line-height: 1.5;
             }
         </style>
     </head>
     <body>
         <header>
-            <img src="http://localhost/icon.png" id="icon">
-            <h1>Lukes Reverse Proxy</h1>
+            <section>
+                <img src="http://localhost/icon.png" id="icon">
+                <h1>Lukes Reverse Proxy</h1>
+            </section>
         </header>
 
         <main>
             <h2>Application <span id="replace_app_name"></span> is not running...</h2>
+            <a href="." class="button">Reload</a>
+            <a href="http://localhost:80/overview" target="_blank" class="button">Overview</a>
             <button>Attempt Startup</button>
         </main>
 
